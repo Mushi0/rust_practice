@@ -95,6 +95,12 @@ fn main() {
     println!("first_word is {}", first_word);
     let second_word = get_first_word2(&message[10..]);
     println!("second_word is {}", second_word);
+
+    // Challenge: removing leading and ending spaces from a string without using .trim()
+    let message = String::from("    Hello, world!  ");
+    println!("string is \"{}\"", message);
+    let result = remove_space(&message);
+    println!("result is \"{}\"", result);
 }
 
 fn process_fuel(propellant: String) {
@@ -139,4 +145,24 @@ fn get_first_word(s: &String) -> &str {
 fn get_first_word2(s: &str) -> &str {
     let first_space = s.find(' ').unwrap_or(s.len());
     &s[0..first_space]
+}
+
+fn remove_space(s: &str) -> &str {
+    let mut start = 0;
+    for (index, item) in s.chars().enumerate() {
+        if item != ' ' {
+            start = index;
+            break;
+        }
+    }
+
+    let mut end = 0;
+    for(index, item) in s.chars().rev().enumerate() {
+        if item != ' ' {
+            end = s.len() - index;
+            break;
+        }
+    }
+
+    &s[start..end]
 }
