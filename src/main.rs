@@ -1,3 +1,10 @@
+// import libraries
+use std::io;
+// search for crates: crates.io
+// add to Cargo.toml
+use rand::random;
+use rand::prelude::*;
+
 fn main() {
     println!("Hello, world!");
 
@@ -101,6 +108,42 @@ fn main() {
     println!("string is \"{}\"", message);
     let result = remove_space(&message);
     println!("result is \"{}\"", result);
+
+    // interact with user
+    let mut buffer = String::new();
+    println!("Enter a message:");
+    io::stdin()
+        .read_line(&mut buffer)
+        .expect("Failed to read line");
+    println!("You entered: {}", buffer);
+
+    // parse the input
+    let number = buffer.trim().parse::<i32>().expect("Failed to parse number");
+    println!("number + 1 is {}", number + 1);
+
+    let number = random::<f64>();
+    println!("random number is {}", number);
+
+    // challenge: number guessing game
+    let secret_number = rand::rng().random_range(1..=100);
+    println!("I'm thinking of a number between 1 and 100...");
+    println!("Guess the number: ");
+    loop {
+        let mut guess = String::new();
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
+        let guess: i32 = guess.trim().parse().expect("Please enter a number");
+
+        if guess < secret_number {
+            println!("Too small!");
+        } else if guess > secret_number {
+            println!("Too big!");
+        } else {
+            println!("You guessed it!");
+            break;
+        }
+    }
 }
 
 fn process_fuel(propellant: String) {
