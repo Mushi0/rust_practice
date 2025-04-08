@@ -4,6 +4,9 @@ use std::io;
 // add to Cargo.toml
 use rand::random;
 use rand::prelude::*;
+use std::env;
+use std::fs;
+use std::io::prelude::*;
 
 fn main() {
     println!("Hello, world!");
@@ -144,6 +147,32 @@ fn main() {
             break;
         }
     }
+
+    // argument parsing
+    if env::args().len() <= 2 {
+        println!("Program requires at least 2 arguments");
+    }else{
+        for (index, argument) in env::args().enumerate() {
+            println!("Argument {}: {}", index, argument);
+        }
+        let arg2 = env::args().nth(2).unwrap();
+        println!("Argument 2: {}", arg2);
+    }
+
+    // read file
+    let contents = fs::read_to_string("planets.txt").unwrap();
+    for line in contents.lines() {
+        println!("{}", line);
+    }
+
+    // write file
+    let mut hello_message = String::new();
+    hello_message.push_str("Hello World!\n");
+    let _ = fs::write("hello_message.txt", hello_message);
+
+    let mut my_file = fs::OpenOptions::new().append(true)
+        .open("hello_message.txt").unwrap();
+    let _ = my_file.write(b"Hello from Earth!\n"); // remember the b prefix! 
 }
 
 fn process_fuel(propellant: String) {
