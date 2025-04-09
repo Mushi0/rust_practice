@@ -112,52 +112,52 @@ fn main() {
     let result = remove_space(&message);
     println!("result is \"{}\"", result);
 
-    // interact with user
-    let mut buffer = String::new();
-    println!("Enter a message:");
-    io::stdin()
-        .read_line(&mut buffer)
-        .expect("Failed to read line");
-    println!("You entered: {}", buffer);
+    // // interact with user
+    // let mut buffer = String::new();
+    // println!("Enter a message:");
+    // io::stdin()
+    //     .read_line(&mut buffer)
+    //     .expect("Failed to read line");
+    // println!("You entered: {}", buffer);
 
-    // parse the input
-    let number = buffer.trim().parse::<i32>().expect("Failed to parse number");
-    println!("number + 1 is {}", number + 1);
+    // // parse the input
+    // let number = buffer.trim().parse::<i32>().expect("Failed to parse number");
+    // println!("number + 1 is {}", number + 1);
 
-    let number = random::<f64>();
-    println!("random number is {}", number);
+    // let number = random::<f64>();
+    // println!("random number is {}", number);
 
-    // challenge: number guessing game
-    let secret_number = rand::rng().random_range(1..=100);
-    println!("I'm thinking of a number between 1 and 100...");
-    println!("Guess the number: ");
-    loop {
-        let mut guess = String::new();
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Failed to read line");
-        let guess: i32 = guess.trim().parse().expect("Please enter a number");
+    // // challenge: number guessing game
+    // let secret_number = rand::rng().random_range(1..=100);
+    // println!("I'm thinking of a number between 1 and 100...");
+    // println!("Guess the number: ");
+    // loop {
+    //     let mut guess = String::new();
+    //     io::stdin()
+    //         .read_line(&mut guess)
+    //         .expect("Failed to read line");
+    //     let guess: i32 = guess.trim().parse().expect("Please enter a number");
 
-        if guess < secret_number {
-            println!("Too small!");
-        } else if guess > secret_number {
-            println!("Too big!");
-        } else {
-            println!("You guessed it!");
-            break;
-        }
-    }
+    //     if guess < secret_number {
+    //         println!("Too small!");
+    //     } else if guess > secret_number {
+    //         println!("Too big!");
+    //     } else {
+    //         println!("You guessed it!");
+    //         break;
+    //     }
+    // }
 
-    // argument parsing
-    if env::args().len() <= 2 {
-        println!("Program requires at least 2 arguments");
-    }else{
-        for (index, argument) in env::args().enumerate() {
-            println!("Argument {}: {}", index, argument);
-        }
-        let arg2 = env::args().nth(2).unwrap();
-        println!("Argument 2: {}", arg2);
-    }
+    // // argument parsing
+    // if env::args().len() <= 2 {
+    //     println!("Program requires at least 2 arguments");
+    // }else{
+    //     for (index, argument) in env::args().enumerate() {
+    //         println!("Argument {}: {}", index, argument);
+    //     }
+    //     let arg2 = env::args().nth(2).unwrap();
+    //     println!("Argument 2: {}", arg2);
+    // }
 
     // read file
     let contents = fs::read_to_string("planets.txt").unwrap();
@@ -173,6 +173,62 @@ fn main() {
     let mut my_file = fs::OpenOptions::new().append(true)
         .open("hello_message.txt").unwrap();
     let _ = my_file.write(b"Hello from Earth!\n"); // remember the b prefix! 
+
+    // Struct
+    // Stuct data is by default stored on the stack
+    // If a stuct also has a String, it will be stored on the heap with the ptr, len, and cap on the stack
+    let mut vehicle = Shuttle {
+        name: String::from("Space Shuttle"),
+        crew_size: 7,
+        propellant: 100.0
+    };
+    println!("vehicle name is {}", vehicle.name);
+    vehicle.name = String::from("SpaceX Falcon 9");
+    println!("Vehicle is {:?}", vehicle);
+
+    // Struct update
+    let vehicle2 = Shuttle {
+        name: String::from("SpaceX Falcon Heavy"),
+        ..vehicle // This will copy the rest of the fields from vehicle
+    };
+    vehicle.crew_size = 6; // This will not affect vehicle2
+    println!("Vehicle is {:?}", vehicle);
+    println!("Vehicle is {:?}", vehicle2);
+
+    let vehicle3 = Shuttle {
+        crew_size: 10,
+        ..vehicle.clone()
+        // Since now we have #[derive(Clone)], 
+        // we can use this to copy the strings in the struct instead of own the strings
+    };
+    println!("Vehicle is {:?}", vehicle);
+    println!("Vehicle is {:?}", vehicle3);
+
+    // Struct methods
+    let vehicle_name = vehicle.get_name();
+    println!("Vehicle name is {}", vehicle_name);
+
+    println!("propellant is {}", vehicle.propellant);
+    vehicle.add_fuel(10.0);
+    println!("propellant is {} after adding fuel", vehicle.propellant);
+
+    // Associated functions
+    let vehicle4 = Shuttle::new("SpaceX Starship");
+    println!("Vehicle is {:?}", vehicle4);
+
+    // Tuple struct
+    let red = Colour(255, 0, 0);
+    println!("First value is {}", red.0);
+
+    let point = Point(10, 20, 30);
+    println!("Y value is {}", get_y(point));
+
+    // Challenge: define a struct to represent a rectangle
+    let mut my_rectangle = Rectangle::new(4.0, 3.0);
+    println!("Rectangle is {:?}", my_rectangle);
+    println!("Area is {}", my_rectangle.area());
+    my_rectangle.scale(2.0);
+    println!("New rectangle is {:?}", my_rectangle);
 }
 
 fn process_fuel(propellant: String) {
@@ -237,4 +293,62 @@ fn remove_space(s: &str) -> &str {
     }
 
     &s[start..end]
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+struct Shuttle {
+    name: String,
+    crew_size: u8,
+    propellant: f64
+}
+
+impl Shuttle {
+    fn get_name(&self) -> &str {
+        &self.name
+    }
+
+    fn add_fuel(&mut self, gallons: f64) {
+        self.propellant += gallons;
+    }
+
+    fn new(name: &str) -> Shuttle {
+        Shuttle {
+            name: String::from(name),
+            crew_size: 7,
+            propellant: 0.0
+        }
+    }
+}
+
+struct Colour(u8, u8, u8); // RGB
+
+struct Point(u8, u8, u8); // X, Y, Z
+
+fn get_y(p: Point) -> u8 {
+    p.1
+}
+
+#[derive(Debug)]
+struct Rectangle {
+    width: f64,
+    height: f64
+}
+
+impl Rectangle {
+    fn area(&self) -> f64 {
+        self.width * self.height
+    }
+
+    fn scale(&mut self, factor: f64) {
+        self.width *= factor;
+        self.height *= factor;
+    }
+
+    fn new(width: f64, height: f64) -> Rectangle {
+        Rectangle {
+            width,
+            height
+        }
+    }
 }
