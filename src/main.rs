@@ -7,6 +7,7 @@ use rand::prelude::*;
 use std::env;
 use std::fs;
 use std::io::prelude::*;
+use std::mem;
 
 fn main() {
     println!("Hello, world!");
@@ -224,11 +225,20 @@ fn main() {
     println!("Y value is {}", get_y(point));
 
     // Challenge: define a struct to represent a rectangle
+    // with width and height as generic types
     let mut my_rectangle = Rectangle::new(4.0, 3.0);
     println!("Rectangle is {:?}", my_rectangle);
     println!("Area is {}", my_rectangle.area());
     my_rectangle.scale(2.0);
     println!("New rectangle is {:?}", my_rectangle);
+
+    // Box data type
+    println!("Vehicle size on stack: {} bytes", mem::size_of_val(&vehicle));
+    let boxed_vehicle: Box<Shuttle> = Box::new(vehicle); // This will move the data to heap
+    println!("Boxed vehicle size on stack: {} bytes", mem::size_of_val(&boxed_vehicle));
+    println!("Boxed vehicle size on heap: {} bytes", mem::size_of_val(&*boxed_vehicle));
+    let unboxed_vehicle = *boxed_vehicle; // This will move the data from heap to stack
+    println!("Unboxed vehicle size on stack: {} bytes", mem::size_of_val(&unboxed_vehicle));
 }
 
 fn process_fuel(propellant: String) {
@@ -330,25 +340,23 @@ fn get_y(p: Point) -> u8 {
 }
 
 #[derive(Debug)]
-struct Rectangle {
-    width: f64,
-    height: f64
+struct Rectangle<T> {
+    width: T,
+    height: T
 }
 
-impl Rectangle {
-    fn area(&self) -> f64 {
+impl<T> Rectangle<T> where T: std::ops::Mul<Output = T> + Copy,
+{
+    fn area(&self) -> T {
         self.width * self.height
     }
 
-    fn scale(&mut self, factor: f64) {
-        self.width *= factor;
-        self.height *= factor;
+    fn scale(&mut self, factor: T) {
+        self.width = self.width * factor;
+        self.height = self.height * factor;
     }
 
-    fn new(width: f64, height: f64) -> Rectangle {
-        Rectangle {
-            width,
-            height
-        }
+    fn new(width: T, height: T) -> Rectangle<T> {
+        Rectangle { width, height }
     }
 }
