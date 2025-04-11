@@ -8,6 +8,8 @@ use std::env;
 use std::fs;
 use std::io::prelude::*;
 use std::mem;
+use std::any;
+use std::fmt;
 
 fn main() {
     println!("Hello, world!");
@@ -239,6 +241,25 @@ fn main() {
     println!("Boxed vehicle size on heap: {} bytes", mem::size_of_val(&*boxed_vehicle));
     let unboxed_vehicle = *boxed_vehicle; // This will move the data from heap to stack
     println!("Unboxed vehicle size on stack: {} bytes", mem::size_of_val(&unboxed_vehicle));
+
+    // Trait
+    println!("Vehicle4 description is {}", vehicle4.description());
+    println!("Vehicle4 default description is {}", vehicle4.description2());
+    // Derie traits
+    let hubble = Satellite {
+        name: String::from("Hubble"),
+        Velocity: 17.5
+    };
+    let gps = Satellite {
+        name: String::from("GPS"),
+        Velocity: 8.0
+    };
+    println!("hubble > gps is {}", hubble > gps);
+
+    // Trait bounds
+    print_type(1);
+    print_type(3.14);
+    print_type("Hello");
 }
 
 fn process_fuel(propellant: String) {
@@ -345,7 +366,8 @@ struct Rectangle<T> {
     height: T
 }
 
-impl<T> Rectangle<T> where T: std::ops::Mul<Output = T> + Copy,
+impl<T> Rectangle<T> 
+    where T: std::ops::Mul<Output = T> + Copy,
 {
     fn area(&self) -> T {
         self.width * self.height
@@ -359,4 +381,35 @@ impl<T> Rectangle<T> where T: std::ops::Mul<Output = T> + Copy,
     fn new(width: T, height: T) -> Rectangle<T> {
         Rectangle { width, height }
     }
+}
+
+trait Description {
+    fn description(&self) -> String;
+}
+
+impl Description for Shuttle {
+    fn description(&self) -> String {
+        format!("{} has {} crew members and {} gallons of propellant", 
+                self.name, self.crew_size, self.propellant)
+    }
+}
+
+trait Description2 {
+    fn description2(&self) -> String {
+        String::from("This is a default description")
+    }
+}
+
+impl Description2 for Shuttle {
+    
+}
+
+#[derive(PartialEq, PartialOrd)]
+struct Satellite {
+    name: String, 
+    Velocity: f64, // miles per second
+}
+
+fn print_type<T: fmt::Display + fmt::Debug>(item: T) {
+    println!("{} is {}", item, any::type_name::<T>());
 }
