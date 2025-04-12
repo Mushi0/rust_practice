@@ -260,6 +260,33 @@ fn main() {
     print_type(1);
     print_type(3.14);
     print_type("Hello");
+
+    // Lifetime Annotation
+    // This is used to specify the lifetime (scope in which the reference is valid) of a reference
+    // Must begin with an apostrophe (') symbol
+    // Names are conventionally single lowercase letters
+    let result;
+    let propellant1 = String::from("RP-1");
+    let propellant2 = String::from("RP-2");
+    result = best_fuel(&propellant1, &propellant2);
+    println!("Best fuel is {}", result);
+    // Lifetime Elision Rules
+    // Lifetime only applies to reference types
+    // If there's exactly one input lifetime, the output lifetime is the same as the input lifetime
+    // If there are multiple input lifetimes, the computer needs implifier
+    // If there's a &self or &mut self, its lifetime will be assigned to all output lifetimes
+
+    // Struct lifetime annotation
+    let vehicle5 = Shuttle_lifetime {
+        name: "Endeavour"
+    };
+    let sender = vehicle5.send_transmission("Greetings from orbit!");
+    println!("Sender is {}", sender);
+
+    // Static lifetime
+    let s: &'static str = "Hello, world!";
+    // This string is stored in the binary and will never be dropped
+    println!("Static string is {}", s);
 }
 
 fn process_fuel(propellant: String) {
@@ -412,4 +439,24 @@ struct Satellite {
 
 fn print_type<T: fmt::Display + fmt::Debug>(item: T) {
     println!("{} is {}", item, any::type_name::<T>());
+}
+
+fn best_fuel<'a>(x: &'a str, y: &'a str) -> &'a str {
+    // The lifetime of the return value is the same as the shortest lifetime of the parameters
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+struct Shuttle_lifetime<'a> {
+    name: &'a str,
+}
+
+impl<'a> Shuttle_lifetime<'a> {
+    fn send_transmission(&self, msg: &str) -> &str {
+        println!("Transmitting message: {}", msg);
+        self.name
+    }
 }
