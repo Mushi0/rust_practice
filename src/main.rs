@@ -287,6 +287,56 @@ fn main() {
     let s: &'static str = "Hello, world!";
     // This string is stored in the binary and will never be dropped
     println!("Static string is {}", s);
+
+    // Enum
+    let my_shape = Shape::Rectangle(1.2, 3.4);
+    println!("my_shape is {:?}", my_shape);
+
+    // Match operation
+    match my_shape {
+        Shape::Circle(radius) => println!("Circle with radius {}", radius),
+        Shape::Rectangle(width, height) => println!("Rectangle with width {} and height {}", width, height),
+        Shape::Triangle(a, b, c) => println!("Triangle with sides {}, {}, and {}", a, b, c)
+    }
+    
+    let my_number = 1u8;
+    let result = match my_number {
+        0 => "zero", 
+        1 => "one",
+        2 => "two",
+        3 => "three", 
+        _ => {
+            println!("{} did not match", my_number);
+            "other"
+        }
+    };
+    println!("result is {}", result);
+
+    // Enum methods
+    let perimeter = my_shape.get_perimeter();
+    println!("Perimeter is {}", perimeter);
+
+    // Rust does not have a traditional null value
+    // Instead, it has an Option enum
+    // enum Option<T? {
+    //     Some(T),
+    //     None
+    // }
+    let countdown = [5, 4, 3, 2, 1];
+    let number = countdown.get(5);
+    // let number = number + 1;
+    // This will not work because number is an Option type
+    let new_number = number.unwrap_or(&0) + 1; // This will return 0 if the value is None
+    let new_number = match number {
+        Some(number) => number + 1,
+        None => 0
+    }; // This will return 0 if the value is None
+    println!("number is {:?}", new_number);
+
+    // If-let
+    if let Some(13) = number {
+        println!("Thirteen!");
+    }
 }
 
 fn process_fuel(propellant: String) {
@@ -458,5 +508,22 @@ impl<'a> Shuttle_lifetime<'a> {
     fn send_transmission(&self, msg: &str) -> &str {
         println!("Transmitting message: {}", msg);
         self.name
+    }
+}
+
+#[derive(Debug)]
+enum Shape {
+    Circle(f64), 
+    Rectangle(f64, f64), 
+    Triangle(f64, f64, f64)
+}
+
+impl Shape {
+    fn get_perimeter(&self) -> f64 {
+        match *self {
+            Shape::Circle(radius) => 2.0 * std::f64::consts::PI * radius,
+            Shape::Rectangle(width, height) => 2.0 * (width + height),
+            Shape::Triangle(a, b, c) => a + b + c
+        }
     }
 }
